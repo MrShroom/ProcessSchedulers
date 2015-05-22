@@ -23,6 +23,22 @@ public class Process
 	*constructor with needed parameters
 	*
 	**/
+	public Process(String vals)
+	{
+		Scanner scanner =  new Scanner(vals);
+		Long processId =new Long(scanner.nextLong());
+		int arrivalTime = scanner.nextInt();
+		int burstTime = scanner.nextInt();
+		int share = (scanner.hasNextInt() ? scanner.nextInt() : 0);
+		setAtributes(processId,arrivalTime, burstTime, share, burstTime, arrivalTime,0,0);
+		scanner.close();		
+	}
+
+	
+	/**
+	*constructor with needed parameters
+	*
+	**/
 	public Process(Long processId,int arrivalTime, int burstTime, int share)
 	{
 		setAtributes(processId,arrivalTime, burstTime, share, burstTime, arrivalTime,0,0);
