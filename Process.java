@@ -31,7 +31,7 @@ public class Process
 		int burstTime = scanner.nextInt();
 		int share = (scanner.hasNextInt() ? scanner.nextInt() : 0);
 		setAtributes(processId,arrivalTime, burstTime, share, burstTime, arrivalTime,0,0);
-		scanner.close();		
+		scanner.close();
 	}
 
 	
@@ -68,7 +68,7 @@ public class Process
 	*setter for process Attributes
 	*
 	**/
-	private void setAtributes(Long processId, int arrivalTime, int bustTime, 
+	private void setAtributes(Long processId, int arrivalTime, int burstTime, 
 								int share, int remainingBurstTime, int lastTime, 
 								int currentWaitTime, int turnAroundTime )
 	{
@@ -130,6 +130,14 @@ public class Process
 	}
 	
 	/**
+	*getter
+	**/
+	public int getTurnAroundTime()
+	{
+		return turnAroundTime;
+	}
+
+	/**
 	*check if process is finished running
 	**/
 	public boolean isFinished ()
@@ -173,7 +181,7 @@ public class Process
 	**/
 	public String output()
 	{
-		return(new String(processId + " " + lastTime + " " + currentWaitTime + " " + turnAroundTime));
+		return(new String(processId + " " + lastTime + " " + currentWaitTime + " " + turnAroundTime + "\n"));
 	}
 }
 	
