@@ -16,7 +16,7 @@ public class ProcessArrivalTimeComparator implements Comparator<Process>
         }
 		if(x.getArrivalTime() == y.getArrivalTime())
 		{
-			return x.compareTo(y);
+			return x.getProcessId().compareTo(y.getProcessId());
 		}
         return 0;
     }
