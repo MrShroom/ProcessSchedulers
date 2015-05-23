@@ -9,15 +9,14 @@ import java.io.*;
 public class FCFSScheduler implements Scheduler 
 {
 
-	private PriorityQueue<Process> arrivalQueue;
-	private Queue<Process> finishedQueue;
+	private PriorityQueue<Process> arrivalQueue,finishedQueue;
 	private int systemTime, totalWaitTime, totalTurnaroundTime;
 
 	
 	public FCFSScheduler()
 	{
 		arrivalQueue = new PriorityQueue<Process>(10, new ProcessArrivalTimeComparator());
-		finishedQueue = new LinkedList<Process>();
+		finishedQueue =  new PriorityQueue<Process>(10, new ProcessIDComparator());
 		systemTime = 0;
 		totalWaitTime = 0;
 		totalTurnaroundTime = 0;
@@ -51,8 +50,8 @@ public class FCFSScheduler implements Scheduler
 
 	private void writeResults(String outputFile) throws IOException
 	{
-		int aveWaitTime = totalWaitTime/finishedQueue.size();
-		int aveTurnaroundTime = totalTurnaroundTime/finishedQueue.size();
+		long aveWaitTime = Math.round((double)totalWaitTime/finishedQueue.size());
+		long aveTurnaroundTime = Math.round((double)totalTurnaroundTime/finishedQueue.size());
 		StringBuilder builder = new StringBuilder();
 		Process currentProcess;
 		

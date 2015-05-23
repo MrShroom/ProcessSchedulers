@@ -183,6 +183,20 @@ public class Process
 	{
 		return(new String(processId + " " + lastTime + " " + currentWaitTime + " " + turnAroundTime + "\n"));
 	}
+	
+	@Override 
+	public String toString()
+	{
+		return(new String("[Process Id: " +             this.processId +
+		                  "\nArrival Time: " +          this.arrivalTime+
+		                  "\nInitail Burst time: " + this.burstTime  +
+		                  "\nShare: " +                 this.share +
+                                  "\nRemaining Burst time: " +  this.remainingBurstTime +
+		                  "\nLast time it used CPU: "+  this.lastTime  +
+                                  "\nCurrent wait time: " +	this.currentWaitTime  +
+		                  "\nCurrent turnaround time(0 if unfinished): " +this.turnAroundTime +
+		                  "]\n"));
+	}
 }
 	
 

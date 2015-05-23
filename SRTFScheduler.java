@@ -8,30 +8,28 @@ import java.io.*;
  
 public class SRTFScheduler implements Scheduler 
 {
-	private PriorityQueue<Process> arrivalQueue, readyQueue;
-	private Queue<Process> finishedQueue;
-	private ProcessRemainingTimeComparator timeComparator;
-	private int systemTime, totalWaitTime, totalTurnaroundTime;
+        private static final boolean DEBUG_MODE = false;
+        private PriorityQueue<Process> arrivalQueue, readyQueue,finishedQueue;
+        private int systemTime, totalWaitTime, totalTurnaroundTime;
 
-	public SRTFScheduler()
-	{
-		arrivalQueue = new PriorityQueue<Process>(10, new ProcessArrivalTimeComparator());
-		timeComparator = new ProcessRemainingTimeComparator();
-		readyQueue = new PriorityQueue<Process>(10, timeComparator);
-		finishedQueue = new LinkedList<Process>();
+        public SRTFScheduler()
+        {
+                arrivalQueue = new PriorityQueue<Process>(10, new ProcessArrivalTimeComparator());
+	        readyQueue = new PriorityQueue<Process>(10, new ProcessRemainingTimeComparator());
+	        finishedQueue =  new PriorityQueue<Process>(10, new ProcessIDComparator());
 		systemTime = 0;
 		totalWaitTime = 0;
 		totalTurnaroundTime = 0;
 	}
 	
-
 	private void fillArrivalQueue(String inputFile) throws IOException
 	{
-	                System.out.println("file: " + inputFile);
-			 BufferedReader input = new BufferedReader(new FileReader(inputFile));
-			while(input.ready())
-				arrivalQueue.add(new Process(input.readLine()));
-			input.close();		
+                if (DEBUG_MODE)
+                        System.out.println("file: " + inputFile);
+		BufferedReader input = new BufferedReader(new FileReader(inputFile));
+		while(input.ready())
+        		arrivalQueue.add(new Process(input.readLine()));
+		input.close();		
 	}
 	
 	private Process nextProcess()
@@ -39,29 +37,22 @@ public class SRTFScheduler implements Scheduler
 	     	if (arrivalQueue.isEmpty())
 	                return readyQueue.poll();
 	                
-	        if  (readyQueue.isEmpty() || 
-	                (arrivalQueue.peek().getArrivalTime() <= systemTime 
-	                && timeComparator.compare(arrivalQueue.peek(), readyQueue.peek()) < 0))
+	        if  (readyQueue.isEmpty() || (arrivalQueue.peek().getArrivalTime() <= systemTime ))
 	        {
 	                int arrived = arrivalQueue.peek().getArrivalTime();	                
-	                while(!arrivalQueue.isEmpty() && arrived == arrivalQueue.peek().getArrivalTime())
-	                {  	                    
-	                        readyQueue.add(arrivalQueue.poll());
-	                }
-	        }
+	                while(!arrivalQueue.isEmpty() && arrived == arrivalQueue.peek().getArrivalTime())	               
+	                        readyQueue.add(arrivalQueue.poll());	                
+	        }     
 	        
-         
-	     return readyQueue.poll();	       
+	        return readyQueue.poll();	       
 	}
 	
 	private int figureOutRunTime(Process currentProcess)
 	{
-	        int minTime = currentProcess.getRemainingBurstTime();
-	        System.out.println(currentProcess.output());
+	        int minTime = currentProcess.getRemainingBurstTime();	        
 	                
-	        if (!readyQueue.isEmpty() 
-	                && minTime >  (arrivalQueue.peek().getArrivalTime() - systemTime))
-	                minTime = arrivalQueue.peek().getArrivalTime() - systemTime;
+	        if (!arrivalQueue.isEmpty())
+	                minTime = Math.min(minTime, (arrivalQueue.peek().getArrivalTime() - systemTime));
 	                	  	
 	        return minTime;
 	}
@@ -75,11 +66,22 @@ public class SRTFScheduler implements Scheduler
 		{	        
 		        currentProcess = nextProcess();
 		        
+		        if (DEBUG_MODE)
+		        {
+		                System.out.println("\n*********************************************************************");
+        		        System.out.println(currentProcess.toString());
+	                }
+	                	        
 		        if(systemTime < currentProcess.getArrivalTime())
 				systemTime  = currentProcess.getArrivalTime();
+				
 		        runtime = figureOutRunTime(currentProcess);
 		        
-			
+		        if(DEBUG_MODE)
+		        {
+        		        System.out.println("will run: " + runtime);
+        		        pressAnyKeyToContinue();
+			}
 				
 			systemTime = currentProcess.runFor(systemTime, runtime);
 			
@@ -91,25 +93,24 @@ public class SRTFScheduler implements Scheduler
 							
 			}
 			else
-			{
 			        readyQueue.add(currentProcess);
-			}
+			
 				
 		}
 	}
 	
 	private void writeResults(String outputFile) throws IOException
 	{
-		int aveWaitTime = totalWaitTime/finishedQueue.size();
-		int aveTurnaroundTime = totalTurnaroundTime/finishedQueue.size();
+		long aveWaitTime = Math.round((double)totalWaitTime/finishedQueue.size());
+		long aveTurnaroundTime = Math.round((double)totalTurnaroundTime/finishedQueue.size());
 		StringBuilder builder = new StringBuilder();
 		Process currentProcess;
 		
 		PrintWriter outputter = new PrintWriter(outputFile); 
+		
 		while((currentProcess = finishedQueue.poll()) != null)
-		{
-			builder.append(currentProcess.output());
-		}
+		        builder.append(currentProcess.output());
+		
 		builder.append(new String(aveWaitTime + " " + aveTurnaroundTime));
 
 		outputter.print(builder.toString());
@@ -131,5 +132,17 @@ public class SRTFScheduler implements Scheduler
 	        {
 		        System.out.println(e.getMessage());
 	        }
+        }
+        
+        private void pressAnyKeyToContinue()
+        { 
+                System.out.println("Press any key to continue...");
+                try
+                {
+                        System.in.read();
+                }         
+                catch(Exception e)
+                {
+                }
         }
 }
