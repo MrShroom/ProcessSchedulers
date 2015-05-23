@@ -6,7 +6,8 @@
 import java.util.*;
 import java.io.*;
 
-public class FCFSScheduler implements Scheduler {
+public class FCFSScheduler implements Scheduler 
+{
 
 	private PriorityQueue<Process> arrivalQueue;
 	private Queue<Process> finishedQueue;
