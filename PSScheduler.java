@@ -1,5 +1,8 @@
-
-/**
+/***
+*	@author Mr.Shroom
+*	Created by: Shaun McThomas
+*	Last Modified:     06/10/15
+*
  * Proportional share scheduler
  * Take total shares to be 100.
  * A process will not run unless it is completely given the requested share.
@@ -11,12 +14,14 @@ import java.io.*;
 public class PSScheduler implements Scheduler 
 {
         private static final int TOTAL_SHARES = 100;
-        private static final boolean DEBUG_MODE = true;
+        private static final boolean DEBUG_MODE = false;
+        
         private PriorityQueue<Process> arrivalQueue,finishedQueue;
         private PriorityQueue<Process> readyQueue;
         private LinkedList<Process> runningList;
         private LinkedList<Integer> startSystemTime;
-        private int systemTime, totalWaitTime, totalTurnaroundTime, curentSharesLeft = TOTAL_SHARES;
+        
+        private int systemTime, totalWaitTime, totalTurnaroundTime, curentSharesLeft;
         
         public PSScheduler()
 	{
@@ -28,28 +33,26 @@ public class PSScheduler implements Scheduler
 		systemTime = 0;
 		totalWaitTime = 0;
 		totalTurnaroundTime = 0;
+		curentSharesLeft = TOTAL_SHARES;
 	}
 	
 	private void fillArrivalQueue(String inputFile) throws IOException
 	{
 	       if (DEBUG_MODE)
-	       {
                         System.out.println("file: " + inputFile + "\n***************************************");
-               }
+                        
 		BufferedReader input = new BufferedReader(new FileReader(inputFile));
+		
 		while(input.ready())
 			arrivalQueue.add(new Process(input.readLine()));
+		
 		input.close();		
 	}
 	
 	private void fillReadyQueue(int tempSystemTime)
 	{
-	        while(!arrivalQueue.isEmpty() && 
-	                (readyQueue.isEmpty() || (arrivalQueue.peek().getArrivalTime() <= tempSystemTime )))
-	        {       
-	                        
-	                        readyQueue.add(arrivalQueue.poll());              
-	        }  
+	        while(!arrivalQueue.isEmpty() && (readyQueue.isEmpty() || (arrivalQueue.peek().getArrivalTime() <= tempSystemTime )))
+	                readyQueue.add(arrivalQueue.poll()); 
 	}
 	
 	private void fillRunningList(int tempSystemTime)
@@ -60,22 +63,19 @@ public class PSScheduler implements Scheduler
 	                runningList.add(readyQueue.poll());
 	                startSystemTime.add(tempSystemTime);
 	        }
-	
 	}
 	
 	private void runSimulation()
 	{
 		Process currentProcess;
 		int runtime, temp;
-	        int currentPos = 0 ;	
+	        int currentPos = 0 ;		
+                
+                fillReadyQueue(systemTime);
+		fillRunningList(systemTime);
 		
-
 		while(!arrivalQueue.isEmpty() || !runningList.isEmpty()|| !readyQueue.isEmpty())
-		{   
-		        fillReadyQueue(systemTime);
-		        fillRunningList(systemTime);
-
-                        
+		{ 
                         for(int itr = 0; itr < runningList.size();itr++)
                         {                                                             
                                 currentProcess = runningList.get(itr);
@@ -86,19 +86,16 @@ public class PSScheduler implements Scheduler
                                         System.out.println("System Time:  " + startSystemTime.get(itr));
                                         pressAnyKeyToContinue();
                                 }
-
-                              
-                                runtime =  currentProcess.getRemainingBurstTime();
-                                                
+                                
+                                runtime =  currentProcess.getRemainingBurstTime();                                                
                                 temp = currentProcess.runFor(startSystemTime.get(itr), runtime);
                                 
                                 if (DEBUG_MODE)
                                         System.out.println("temp : " + temp + "\n");
                                 
                                 if(temp > systemTime)
-                                        systemTime = temp;                               
-                                            
-
+                                        systemTime = temp; 
+                                        
 			        if(currentProcess.isFinished())
 			        { 		          
 				        finishedQueue.add(currentProcess);
@@ -121,8 +118,7 @@ public class PSScheduler implements Scheduler
         @Override
         public void schedule(String inputFile, String outputFile) 
         {
-        // implement your scheduler here.
-        // write the scheduler output to {@code outputFile}
+
 	        try
 	        {
 		        fillArrivalQueue(inputFile);		        
@@ -142,17 +138,14 @@ public class PSScheduler implements Scheduler
 	{
 		long aveWaitTime = Math.round((double)totalWaitTime/finishedQueue.size());
 		long aveTurnaroundTime = Math.round((double)totalTurnaroundTime/finishedQueue.size());
-		StringBuilder builder = new StringBuilder();
 		Process currentProcess;
 		
-		PrintWriter outputter = new PrintWriter(outputFile); 
+		BufferedWriter outputter = new BufferedWriter (new FileWriter(outputFile)); 
 		while((currentProcess = finishedQueue.poll()) != null)
 		{
-			builder.append(currentProcess.output());
+			outputter.write(currentProcess.output());
 		}
-		builder.append(new String(aveWaitTime + " " + aveTurnaroundTime));
-
-		outputter.print(builder.toString());
+		outputter.write(new String(aveWaitTime + " " + aveTurnaroundTime));
 		outputter.close();
 	}
 	

@@ -1,5 +1,8 @@
-
-/**
+/***
+*	@author Mr.Shroom
+*	Created by: Shaun McThomas
+*	Last Modified:     06/10/15
+*
  * Shortest remaining time first scheduler
  */
  
@@ -26,6 +29,7 @@ public class SRTFScheduler implements Scheduler
 	{
                 if (DEBUG_MODE)
                         System.out.println("file: " + inputFile);
+                        
 		BufferedReader input = new BufferedReader(new FileReader(inputFile));
 		while(input.ready())
         		arrivalQueue.add(new Process(input.readLine()));
@@ -33,11 +37,9 @@ public class SRTFScheduler implements Scheduler
 	}
 	
 	private Process nextProcess()
-	{
-	     	if (arrivalQueue.isEmpty())
-	                return readyQueue.poll();
-	                
-	        if  (readyQueue.isEmpty() || (arrivalQueue.peek().getArrivalTime() <= systemTime ))
+	{        
+	        if  (readyQueue.isEmpty() || 
+	                (!arrivalQueue.isEmpty() && arrivalQueue.peek().getArrivalTime() <= systemTime ))
 	        {
 	                int arrived = arrivalQueue.peek().getArrivalTime();	                
 	                while(!arrivalQueue.isEmpty() && arrived == arrivalQueue.peek().getArrivalTime())	               
@@ -93,8 +95,7 @@ public class SRTFScheduler implements Scheduler
 							
 			}
 			else
-			        readyQueue.add(currentProcess);
-			
+			        readyQueue.add(currentProcess);			
 				
 		}
 	}
@@ -103,25 +104,22 @@ public class SRTFScheduler implements Scheduler
 	{
 		long aveWaitTime = Math.round((double)totalWaitTime/finishedQueue.size());
 		long aveTurnaroundTime = Math.round((double)totalTurnaroundTime/finishedQueue.size());
-		StringBuilder builder = new StringBuilder();
 		Process currentProcess;
 		
-		PrintWriter outputter = new PrintWriter(outputFile); 
-		
+		BufferedWriter outputter = new BufferedWriter (new FileWriter(outputFile)); 
 		while((currentProcess = finishedQueue.poll()) != null)
-		        builder.append(currentProcess.output());
-		
-		builder.append(new String(aveWaitTime + " " + aveTurnaroundTime));
+		{
+			outputter.write(currentProcess.output());
+		}
+		outputter.write(new String(aveWaitTime + " " + aveTurnaroundTime));
 
-		outputter.print(builder.toString());
 		outputter.close();
 	}
 
         @Override
   	public void schedule(String inputFile, String outputFile) 
 	{
-        // implement your scheduler here.
-        // write the scheduler output to {@code outputFile}
+
 		try
 	        {
 		        fillArrivalQueue(inputFile);

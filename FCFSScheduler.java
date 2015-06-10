@@ -1,7 +1,10 @@
-
-/**
- * First comes first served scheduler.
- */
+/***
+*	@author Mr.Shroom
+*	Created by: Shaun McThomas
+*	Last Modified:     06/10/15
+*
+* First comes first served scheduler.
+****/
  
 import java.util.*;
 import java.io.*;
@@ -9,10 +12,8 @@ import java.io.*;
 public class FCFSScheduler implements Scheduler 
 {
 
-        private static final int TOTAL_SHARES = 100; 
 	private PriorityQueue<Process> arrivalQueue,finishedQueue;
 	private int systemTime, totalWaitTime, totalTurnaroundTime;
-
 	
 	public FCFSScheduler()
 	{
@@ -39,13 +40,9 @@ public class FCFSScheduler implements Scheduler
 			if(systemTime < currentProcess.getArrivalTime())
 				systemTime  = currentProcess.getArrivalTime();
 			systemTime = currentProcess.runFor(systemTime, currentProcess.getRemainingBurstTime());
-			if(currentProcess.isFinished())
-			{
-				finishedQueue.add(currentProcess);
-				totalWaitTime += currentProcess.getCurrentWaitTime();
-				totalTurnaroundTime += currentProcess.getTurnAroundTime();				
-			}
-				
+			finishedQueue.add(currentProcess);
+			totalWaitTime += currentProcess.getCurrentWaitTime();
+			totalTurnaroundTime += currentProcess.getTurnAroundTime();						
 		}
 	}
 
@@ -53,17 +50,15 @@ public class FCFSScheduler implements Scheduler
 	{
 		long aveWaitTime = Math.round((double)totalWaitTime/finishedQueue.size());
 		long aveTurnaroundTime = Math.round((double)totalTurnaroundTime/finishedQueue.size());
-		StringBuilder builder = new StringBuilder();
 		Process currentProcess;
 		
-		PrintWriter outputter = new PrintWriter(outputFile); 
+		BufferedWriter outputter = new BufferedWriter (new FileWriter(outputFile)); 
 		while((currentProcess = finishedQueue.poll()) != null)
 		{
-			builder.append(currentProcess.output());
+			outputter.write(currentProcess.output());
 		}
-		builder.append(new String(aveWaitTime + " " + aveTurnaroundTime));
+		outputter.write(new String(aveWaitTime + " " + aveTurnaroundTime));
 
-		outputter.print(builder.toString());
 		outputter.close();
 	}
 

@@ -1,7 +1,7 @@
 /***
 *	@author Mr.Shroom
 *	Created by: Shaun McThomas
-*	Last Modified:     05/22/15
+*	Last Modified:     06/10/15
 *	This a simple class to represent a process in a scheduler algorithm
 *	It will be used in simulations 
 ****/
@@ -26,7 +26,7 @@ public class Process
 	public Process(String vals)
 	{
 		Scanner scanner =  new Scanner(vals);
-		Long processId =new Long(scanner.nextLong());
+		Long processId = new Long(scanner.nextLong());
 		int arrivalTime = scanner.nextInt();
 		int burstTime = scanner.nextInt();
 		int share = (scanner.hasNextInt() ? scanner.nextInt() : 0);
@@ -156,14 +156,14 @@ public class Process
 	**/
 	public int runFor (int systemTime, int runAmount)
 	{
-		if(!isFinished())								//if the process is finished, we don't run it
+		if(!isFinished())                               //if the process is finished, we don't run it
 		{
-			if(remainingBurstTime < runAmount)			//make sure we don't run past the end 
+			if(remainingBurstTime < runAmount)      //make sure we don't run past the end 
 				runAmount = remainingBurstTime;
 				
-			remainingBurstTime -= runAmount;			//logic involved in the running of a process
+			remainingBurstTime -= runAmount;		//logic involved in the running of a process
 			currentWaitTime += (systemTime - lastTime);	//bookkeeping so we can easily know wait time 
-			lastTime = systemTime + runAmount;			//needed to figure out wait and turn Around Time
+			lastTime = systemTime + runAmount;		//needed to figure out wait and turn Around Time
 			
 			if(isFinished())
 				turnAroundTime = lastTime - arrivalTime; //now that we're done we can calculate turn Around Time
@@ -194,7 +194,7 @@ public class Process
                                   "\nRemaining Burst time: " +  this.remainingBurstTime +
 		                  "\nLast time it used CPU: "+  this.lastTime  +
                                   "\nCurrent wait time: " +	this.currentWaitTime  +
-		                  "\nCurrent turnaround time(0 if unfinished): " +this.turnAroundTime +
+		                  "\nCurrent turnaround time(0 if unfinished): " + this.turnAroundTime +
 		                  "]\n"));
 	}
 }
