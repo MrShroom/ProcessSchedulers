@@ -9,6 +9,7 @@ import java.io.*;
 public class FCFSScheduler implements Scheduler 
 {
 
+        private static final int TOTAL_SHARES = 100; 
 	private PriorityQueue<Process> arrivalQueue,finishedQueue;
 	private int systemTime, totalWaitTime, totalTurnaroundTime;
 
@@ -24,10 +25,10 @@ public class FCFSScheduler implements Scheduler
 	
 	private void fillArrivalQueue(String inputFile) throws IOException
 	{
-			 BufferedReader input = new BufferedReader(new FileReader(inputFile));
-			while(input.ready())
-				arrivalQueue.add(new Process(input.readLine()));
-			input.close();		
+		BufferedReader input = new BufferedReader(new FileReader(inputFile));
+		while(input.ready())
+			arrivalQueue.add(new Process(input.readLine()));
+		input.close();		
 	}
 	
 	private void runSimulation()
